@@ -7,6 +7,18 @@ const userScheme = new Schema({
         min: 6,
         max: 255
     },
+    firstName: {
+        type: String,
+        required: true,
+        min: 6,
+        max: 255
+    },
+    lastName: {
+        type: String,
+        required: true,
+        min: 6,
+        max: 255
+    },
     password: {
         type: String,
         required: true,
