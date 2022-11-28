@@ -24,7 +24,8 @@ async function main() {
 app.post('/register', async (req, res) => {
     const { error } = Joi.object({
         userName: Joi.string().min(6).max(255).required(),
-        password: Joi.string().min(6).max(1024).required()
+        password: Joi.string().min(6).max(1024).required(),
+        passwordConfirmed: Joi.string().min(6).max(1024).required()
     }).validate(req.body)
 
     if (error) return res.json({ message: 'Please provide valid information!' })
@@ -32,6 +33,10 @@ app.post('/register', async (req, res) => {
     const userNameExists = await User.findOne({ userName: req.body.userName })
 
     if (userNameExists) return res.json({ message: 'Username is taken.'})
+
+    if (req.body.password !== req.body.passwordConfirmed) return res.json({
+        message: 'Please provide valid password confirmation.'
+    })
 
     const salt = await bcrypt.genSalt(10)
     const password = await bcrypt.hash(req.body.password, salt)
