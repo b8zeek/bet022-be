@@ -1,12 +1,16 @@
+import * as dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import Joi from '@hapi/joi'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 import { User } from './models/User.js'
 import { GameEvent, SpecialEvent } from './models/Event.js'
 import { Bet } from './models/Bet.js'
+
+dotenv.config()
 
 const app = express()
 app.use(cors())
@@ -71,8 +75,16 @@ app.post('/login', async (req, res) => {
 
     if (!validPassword) return res.json({ message: 'Invalid password!' })
 
-    res.json({
-        data: 'Logged in!'
+    const token = jwt.sign({
+        id: user._id,
+        userName: user.userName
+    }, process.env.TOKEN_SECRET)
+
+    res.header('auth-token', token).json({
+        data: {
+            userName: user.userName,
+            token
+        }
     })
 })
 
