@@ -8,10 +8,11 @@ import { User } from '../models/User.js'
 const router = express.Router()
 
 router.post('/register', async (req, res) => {
+    console.log('BODY', req.body)
     const { error } = Joi.object({
-        userName: Joi.string().min(6).max(255).required(),
-        firstName: Joi.string().min(6).max(255).required(),
-        lastName: Joi.string().min(6).max(255).required(),
+        userName: Joi.string().min(3).max(32).required(),
+        firstName: Joi.string().min(3).max(32).required(),
+        lastName: Joi.string().min(3).max(32).required(),
         password: Joi.string().min(6).max(1024).required(),
         passwordConfirmed: Joi.string().min(6).max(1024).required()
     }).validate(req.body)
@@ -54,7 +55,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { error } = Joi.object({
-        userName: Joi.string().min(6).max(255).required(),
+        userName: Joi.string().min(3).max(32).required(),
         password: Joi.string().min(6).max(1024).required()
     }).validate(req.body)
 
