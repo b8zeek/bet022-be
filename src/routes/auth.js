@@ -37,16 +37,16 @@ router.post('/register', async (req, res) => {
     })
 
     try {
-        const data = await user.save()
+        const newUser = await user.save()
 
         const token = jwt.sign({
-            id: data._id,
-            userName: data.userName,
-            firstName: data.firstName,
-            lastName: data.lastName
+            id: newUser._id,
+            userName: newUser.userName,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName
         }, process.env.TOKEN_SECRET)
 
-        res.header('auth-token', token).json({ data })
+        res.header('auth-token', token).json({ data: newUser })
     } catch (error) {
         return res.json({ error })
     }
@@ -70,15 +70,12 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({
         id: user._id,
-        userName: user.userName
+        userName: user.userName,
+        firstName: data.firstName,
+        lastName: data.lastName
     }, process.env.TOKEN_SECRET)
 
-    res.header('auth-token', token).json({
-        data: {
-            userName: user.userName,
-            token
-        }
-    })
+    res.header('auth-token', token).json({ data: user })
 })
 
 export default router
