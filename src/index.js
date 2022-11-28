@@ -47,11 +47,11 @@ app.post('/game', async (req, res) => {
     } = req.body
 
     if (!homeTeam || !awayTeam || !date) return res.json({
-        message: 'Please provide necessary game information!'
+        message: 'Please provide necessary event information!'
     })
 
     try {
-        const game = await GameEvent.create({
+        const data = await GameEvent.create({
             homeTeam,
             awayTeam,
             date,
@@ -59,7 +59,33 @@ app.post('/game', async (req, res) => {
             award: 1
         })
 
-        res.json({ data: game })
+        res.json({ data })
+    } catch (error) {
+        return res.json({ error })
+    }
+})
+
+app.post('/special', async (req, res) => {
+    const {
+        description,
+        date,
+        availableTips,
+        award
+    } = req.body
+
+    if (!description || !date || !availableTips || !award) return res.json({
+        message: 'Please provide necessary event information!'
+    })
+
+    try {
+        const data = await SpecialEvent.create({
+            description,
+            date,
+            availableTips,
+            award
+        })
+
+        res.json({ data })
     } catch (error) {
         return res.json({ error })
     }
