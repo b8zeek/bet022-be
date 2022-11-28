@@ -10,6 +10,8 @@ const router = express.Router()
 router.post('/register', async (req, res) => {
     const { error } = Joi.object({
         userName: Joi.string().min(6).max(255).required(),
+        firstName: Joi.string().min(6).max(255).required(),
+        lastName: Joi.string().min(6).max(255).required(),
         password: Joi.string().min(6).max(1024).required(),
         passwordConfirmed: Joi.string().min(6).max(1024).required()
     }).validate(req.body)
@@ -18,7 +20,7 @@ router.post('/register', async (req, res) => {
 
     const userNameExists = await User.findOne({ userName: req.body.userName })
 
-    if (userNameExists) return res.json({ message: 'Username is taken.'})
+    if (userNameExists) return res.json({ message: 'Username is already taken.'})
 
     if (req.body.password !== req.body.passwordConfirmed) return res.json({
         message: 'Please provide valid password confirmation.'
@@ -29,6 +31,8 @@ router.post('/register', async (req, res) => {
 
     const user = new User({
         userName: req.body.userName,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         password
     })
 
@@ -37,7 +41,9 @@ router.post('/register', async (req, res) => {
 
         const token = jwt.sign({
             id: data._id,
-            userName: data.userName
+            userName: data.userName,
+            firstName: data.firstName,
+            lastName: data.lastName
         }, process.env.TOKEN_SECRET)
 
         res.header('auth-token', token).json({ data })
