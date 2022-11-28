@@ -1,6 +1,8 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
+import Joi from '@hapi/joi'
+import bcrypt from 'bcrypt'
 
 import { User } from './models/User.js'
 import { GameEvent, SpecialEvent } from './models/Event.js'
@@ -18,6 +20,35 @@ async function main() {
   await mongoose.connect('mongodb+srv://bejzik8:Bet022SidCaffe@cluster0.whedoef.mongodb.net/new?retryWrites=true&w=majority')
   .then(() => console.log('Connected to database...'))
 }
+
+app.post('/register', async (req, res) => {
+    const { error } = Joi.object({
+        userName: Joi.string().min(6).max(255).required(),
+        password: Joi.string().min(6).max(1024).required()
+    }).validate(req.body)
+
+    if (error) return res.json({ message: 'Please provide valid information!' })
+
+    const userNameExists = await User.findOne({ userName: req.body.userName })
+
+    if (userNameExists) return res.json({ message: 'Username is taken.'})
+
+    const salt = await bcrypt.genSalt(10)
+    const password = await bcrypt.hash(req.body.password, salt)
+
+    const user = new User({
+        userName: req.body.userName,
+        password
+    })
+
+    try {
+        const data = await user.save()
+
+        res.json({ data })
+    } catch (error) {
+        return res.json({ error })
+    }
+})
 
 app.post('/user', async (req, res) => {
     const { userName } = req.body
