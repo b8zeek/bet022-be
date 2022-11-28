@@ -9,8 +9,6 @@ router.post('/:userName/bets', async (req, res) => {
     const { bets } = req.body
     const { userName } = req.params
 
-    console.log('BETS ', bets)
-
     const user = await User.findOne({ userName })
 
 	if (!user) return res.json({ message: 'No user with this username.' })
