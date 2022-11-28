@@ -2,7 +2,8 @@ import * as dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
-import jwt from 'jsonwebtoken'
+
+import { verifyToken, isAdmin } from './validators.js'
 
 import authRoutes from './routes/auth.js'
 import betRoutes from './routes/bet.js'
@@ -25,32 +26,8 @@ async function main() {
     ).then(() => console.log('Connected to database...'))
 }
 
-const verifyToken = (req, res, next) => {
-    const token = req.header('auth-token')
-
-    if (!token) return res.json({ error: 'Access denied!' })
-
-    try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET)
-
-        req.user = verified
-
-        next()
-    } catch (error) {
-        res.json({ error: 'Token isn\'t valid!' })
-    }
-}
-
-const isAdmin = async (req, res, next) => {
-    if (!req.user.isAdmin) return res.send({ message: 'Not an admin!' })
-
-    next()
-}
-
 app.use('/', authRoutes)
 app.use('/user', verifyToken, betRoutes)
 app.use('/admin', verifyToken, isAdmin, adminRoutes)
 
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}...`)
-})
+app.listen(PORT, () => console.log(`Listening on port ${PORT}...`))
