@@ -12,6 +12,9 @@ const userScheme = new Schema({
         required: true,
         min: 6,
         max: 255
+    },
+    isAdmin: {
+        type: Boolean
     }
 })
 
