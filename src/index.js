@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 
 import Todo from './models/Todo.js'
+import { GameEvent, SpecialEvent } from './models/Event.js'
 
 const app = express()
 app.use(cors())
@@ -34,6 +35,32 @@ app.post('/todo', async (req, res) => {
         res.json({ data: createdTodo })
     } catch (error) {
         console.log(error)
+        return res.json({ error })
+    }
+})
+
+app.post('/game', async (req, res) => {
+    const {
+        homeTeam,
+        awayTeam,
+        date
+    } = req.body
+
+    if (!homeTeam || !awayTeam || !date) return res.json({
+        message: 'Please provide necessary game information!'
+    })
+
+    try {
+        const game = await GameEvent.create({
+            homeTeam,
+            awayTeam,
+            date,
+            availableTips: ['1', 'x', '2'],
+            award: 1
+        })
+
+        res.json({ data: game })
+    } catch (error) {
         return res.json({ error })
     }
 })
