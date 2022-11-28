@@ -28,7 +28,7 @@ app.post('/register', async (req, res) => {
         passwordConfirmed: Joi.string().min(6).max(1024).required()
     }).validate(req.body)
 
-    if (error) return res.json({ message: 'Please provide valid information!' })
+    if (error) return res.json({ message: 'Please provide valid registration information!' })
 
     const userNameExists = await User.findOne({ userName: req.body.userName })
 
@@ -53,6 +53,27 @@ app.post('/register', async (req, res) => {
     } catch (error) {
         return res.json({ error })
     }
+})
+
+app.post('/login', async (req, res) => {
+    const { error } = Joi.object({
+        userName: Joi.string().min(6).max(255).required(),
+        password: Joi.string().min(6).max(1024).required()
+    }).validate(req.body)
+
+    if (error) return res.json({ message: 'Please provide valid login information!' })
+
+    const user = await User.findOne({ userName: req.body.userName })
+
+    if (!user) return res.json({ message: 'User with this username doesn\'t exist.'})
+
+    const validPassword = await bcrypt.compare(req.body.password, user.password)
+
+    if (!validPassword) return res.json({ message: 'Invalid password!' })
+
+    res.json({
+        data: 'Logged in!'
+    })
 })
 
 app.post('/user', async (req, res) => {
