@@ -2,8 +2,9 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 
-import Todo from './models/Todo.js'
+import { User } from './models/User.js'
 import { GameEvent, SpecialEvent } from './models/Event.js'
+import { Bet } from './models/Bet.js'
 
 const app = express()
 app.use(cors())
@@ -18,23 +19,16 @@ async function main() {
   .then(() => console.log('Connected to database...'))
 }
 
-app.get('/', (_, res) => {
-    res.json({ message: 'Welcome!' })
-})
+app.post('/user', async (req, res) => {
+    const { userName } = req.body
 
-app.post('/todo', async (req, res) => {
-    const { description } = req.body
-
-    console.log('DESC', description)
-
-    if (!description) return res.json({ message: 'Please add description for your Todo.' })
+    if (!userName) return res.json({ message: 'Username is required.' })
 
     try {
-        const createdTodo = await Todo.create({ description })
+        const data = await User.create({ userName })
 
-        res.json({ data: createdTodo })
+        res.json({ data })
     } catch (error) {
-        console.log(error)
         return res.json({ error })
     }
 })
@@ -89,6 +83,36 @@ app.post('/special', async (req, res) => {
     } catch (error) {
         return res.json({ error })
     }
+})
+
+app.post('/:userName/bets', async (req, res) => {
+    const { bets } = req.body
+    const { userName } = req.params
+
+    console.log('BETS ', bets)
+
+    const user = await User.findOne({ userName })
+
+	if (!user) return res.json({ message: 'No user with this username.' })
+
+    if (bets?.length !== 0) {
+        const filteredBets = bets.filter(({ eventId, outcome }) => eventId && outcome)
+
+        if (filteredBets.length !== 0) {
+            const data = await Bet.bulkWrite(filteredBets.map(({ eventId, outcome }) => ({
+                updateOne: {
+                    filter: { userId: user._id, eventId },
+                    update: { outcome },
+                    upsert: true
+                }
+            })))
+    
+            res.json({ data })
+        }
+    } else {
+        return res.json({ message: 'Please provide valid bets information.' })
+    }
+
 })
 
 app.listen(PORT, () => {

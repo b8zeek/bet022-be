@@ -1,4 +1,4 @@
-const { Schema, model, ObjectId } = mongoose
+import { Schema, model, ObjectId } from 'mongoose'
 
 const betScheme = new Schema({
     userId: {
@@ -16,3 +16,5 @@ const betScheme = new Schema({
         required: true
     }
 })
+
+export const Bet = model('Bet', betScheme)
