@@ -6,7 +6,7 @@ import cors from 'cors'
 import { verifyToken, isAdmin } from './validators.js'
 
 import authRoutes from './routes/auth.js'
-import betRoutes from './routes/bet.js'
+import userRoutes from './routes/user.js'
 import adminRoutes from './routes/admin.js'
 
 dotenv.config()
@@ -27,7 +27,7 @@ async function main() {
 }
 
 app.use('/', authRoutes)
-app.use('/user', verifyToken, betRoutes)
+app.use('/user', verifyToken, userRoutes)
 app.use('/admin', verifyToken, isAdmin, adminRoutes)
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`))
