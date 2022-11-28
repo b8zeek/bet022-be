@@ -2,13 +2,13 @@ import * as dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
-import Joi from '@hapi/joi'
-import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import { User } from './models/User.js'
 import { GameEvent, SpecialEvent } from './models/Event.js'
-import { Bet } from './models/Bet.js'
+
+import authRoutes from './routes/auth.js'
+import betRoutes from './routes/bet.js'
 
 dotenv.config()
 
@@ -21,72 +21,30 @@ const PORT = process.env.PORT || 3000
 main().catch(err => console.log(err))
 
 async function main() {
-  await mongoose.connect('mongodb+srv://bejzik8:Bet022SidCaffe@cluster0.whedoef.mongodb.net/new?retryWrites=true&w=majority')
-  .then(() => console.log('Connected to database...'))
+    await mongoose.connect(
+        `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.whedoef.mongodb.net/${process.env.DBNAME}?retryWrites=true&w=majority`,
+        { useNewUrlParser: true, useUnifiedTopology: true }
+    ).then(() => console.log('Connected to database...'))
 }
 
-app.post('/register', async (req, res) => {
-    const { error } = Joi.object({
-        userName: Joi.string().min(6).max(255).required(),
-        password: Joi.string().min(6).max(1024).required(),
-        passwordConfirmed: Joi.string().min(6).max(1024).required()
-    }).validate(req.body)
+const verifyToken = (req, res, next) => {
+    const token = req.header('auth-token')
 
-    if (error) return res.json({ message: 'Please provide valid registration information!' })
-
-    const userNameExists = await User.findOne({ userName: req.body.userName })
-
-    if (userNameExists) return res.json({ message: 'Username is taken.'})
-
-    if (req.body.password !== req.body.passwordConfirmed) return res.json({
-        message: 'Please provide valid password confirmation.'
-    })
-
-    const salt = await bcrypt.genSalt(10)
-    const password = await bcrypt.hash(req.body.password, salt)
-
-    const user = new User({
-        userName: req.body.userName,
-        password
-    })
+    if (!token) return res.json({ error: 'Access denied!' })
 
     try {
-        const data = await user.save()
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET)
 
-        res.json({ data })
+        req.user = verified
+
+        next()
     } catch (error) {
-        return res.json({ error })
+        res.json({ error: 'Token isn\'t valid!' })
     }
-})
+}
 
-app.post('/login', async (req, res) => {
-    const { error } = Joi.object({
-        userName: Joi.string().min(6).max(255).required(),
-        password: Joi.string().min(6).max(1024).required()
-    }).validate(req.body)
-
-    if (error) return res.json({ message: 'Please provide valid login information!' })
-
-    const user = await User.findOne({ userName: req.body.userName })
-
-    if (!user) return res.json({ message: 'User with this username doesn\'t exist.'})
-
-    const validPassword = await bcrypt.compare(req.body.password, user.password)
-
-    if (!validPassword) return res.json({ message: 'Invalid password!' })
-
-    const token = jwt.sign({
-        id: user._id,
-        userName: user.userName
-    }, process.env.TOKEN_SECRET)
-
-    res.header('auth-token', token).json({
-        data: {
-            userName: user.userName,
-            token
-        }
-    })
-})
+app.use('/', authRoutes)
+app.use('/user', verifyToken, betRoutes)
 
 app.post('/user', async (req, res) => {
     const { userName } = req.body
@@ -152,36 +110,6 @@ app.post('/special', async (req, res) => {
     } catch (error) {
         return res.json({ error })
     }
-})
-
-app.post('/:userName/bets', async (req, res) => {
-    const { bets } = req.body
-    const { userName } = req.params
-
-    console.log('BETS ', bets)
-
-    const user = await User.findOne({ userName })
-
-	if (!user) return res.json({ message: 'No user with this username.' })
-
-    if (bets?.length !== 0) {
-        const filteredBets = bets.filter(({ eventId, outcome }) => eventId && outcome)
-
-        if (filteredBets.length !== 0) {
-            const data = await Bet.bulkWrite(filteredBets.map(({ eventId, outcome }) => ({
-                updateOne: {
-                    filter: { userId: user._id, eventId },
-                    update: { outcome },
-                    upsert: true
-                }
-            })))
-    
-            res.json({ data })
-        }
-    } else {
-        return res.json({ message: 'Please provide valid bets information.' })
-    }
-
 })
 
 app.listen(PORT, () => {
