@@ -5,6 +5,10 @@ import { Bet } from '../models/Bet.js'
 
 const router = express.Router()
 
+router.get('/', async (req, res) => {
+    res.json({ data: req.user })
+})
+
 router.post('/:userName/bets', async (req, res) => {
     const { bets } = req.body
     const { userName } = req.params
@@ -31,6 +35,16 @@ router.post('/:userName/bets', async (req, res) => {
         return res.json({ message: 'Please provide valid bets information.' })
     }
 
+})
+
+router.get('/standings', async (req, res) => {
+    try {
+        const users = User.find()
+
+        console.log('USERS', users)
+    } catch (error) {
+        return res.json({ error })
+    }
 })
 
 export default router
