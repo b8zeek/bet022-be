@@ -47,7 +47,10 @@ router.post('/register', async (req, res) => {
             lastName: newUser.lastName
         }, process.env.TOKEN_SECRET)
 
-        res.header('auth-token', token).json({ data: newUser })
+        res.set({
+            'Access-Control-Expose-Headers': 'auth-token',
+            'auth-token': token
+        }).json({ data: newUser })
     } catch (error) {
         return res.json({ error })
     }
@@ -76,7 +79,10 @@ router.post('/login', async (req, res) => {
         lastName: data.lastName
     }, process.env.TOKEN_SECRET)
 
-    res.header('auth-token', token).json({ data: user })
+    res.set({
+        'Access-Control-Expose-Headers': 'auth-token',
+        'auth-token': token
+    }).json({ data: user })
 })
 
 export default router
