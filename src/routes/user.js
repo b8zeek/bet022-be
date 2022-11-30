@@ -1,12 +1,21 @@
 import express from 'express'
 
 import { User } from '../models/User.js'
+import { Event } from '../models/Event.js'
 import { Bet } from '../models/Bet.js'
 
 const router = express.Router()
 
 router.get('/', async (req, res) => {
     res.json({ data: req.user })
+})
+
+router.get('/events', async (req, res) => {
+    const user = req.user
+
+    const events = await Event.find({ date: { $gte: Date.now() } })
+
+    res.json({ events })
 })
 
 router.post('/:userName/bets', async (req, res) => {
