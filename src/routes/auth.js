@@ -78,13 +78,19 @@ router.post('/login', async (req, res) => {
         userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdmin: user.lastName
+        isAdmin: user.isAdmin
     }, process.env.TOKEN_SECRET)
 
     res.set({
         'Access-Control-Expose-Headers': 'auth-token',
         'auth-token': token
-    }).json({ data: user })
+    }).json({ data: {
+        id: user._id,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isAdmin: user.isAdmin
+    }})
 })
 
 export default router
