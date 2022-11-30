@@ -29,5 +29,6 @@ async function main() {
 app.use('/', authRoutes)
 app.use('/user', verifyToken, userRoutes)
 app.use('/admin', verifyToken, isAdmin, adminRoutes)
+app.use((_, res) => res.json({ error: 'Invalid request, no route!' }))
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`))
