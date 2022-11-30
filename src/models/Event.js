@@ -16,7 +16,7 @@ const eventSchema = new Schema({
     }
 }, { discriminatorKey: 'type' })
 
-const Event = model('Event', eventSchema)
+export const Event = model('Event', eventSchema)
 
 export const GameEvent = Event.discriminator(
     'Game',
