@@ -18,13 +18,14 @@ router.get('/events', async (req, res) => {
     res.json({ events })
 })
 
-router.post('/:userName/bets', async (req, res) => {
+router.post('/bets', async (req, res) => {
     const { bets } = req.body
-    const { userName } = req.params
 
-    const user = await User.findOne({ userName })
+    console.log('BETS', bets)
 
-	if (!user) return res.json({ message: 'No user with this username.' })
+    const user = req.user
+
+    console.log('USER', user)
 
     if (bets?.length !== 0) {
         const filteredBets = bets.filter(({ eventId, outcome }) => eventId && outcome)
@@ -32,7 +33,7 @@ router.post('/:userName/bets', async (req, res) => {
         if (filteredBets.length !== 0) {
             const data = await Bet.bulkWrite(filteredBets.map(({ eventId, outcome }) => ({
                 updateOne: {
-                    filter: { userId: user._id, eventId },
+                    filter: { userId: user.id, eventId },
                     update: { outcome },
                     upsert: true
                 }
