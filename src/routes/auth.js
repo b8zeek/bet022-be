@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
             userName: newUser.userName,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
-            isAdmin: newUser.lastName
+            isAdmin: newUser.isAdmin
         }, process.env.TOKEN_SECRET)
 
         res.set({
