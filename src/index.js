@@ -20,10 +20,11 @@ const PORT = process.env.PORT || 3000
 main().catch(err => console.log(err))
 
 async function main() {
-    await mongoose.connect(
-        `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.whedoef.mongodb.net/${process.env.DBNAME}?retryWrites=true&w=majority`,
-        { useNewUrlParser: true, useUnifiedTopology: true }
-    ).then(() => console.log('Connected to database...'))
+    await mongoose
+        .connect(
+            `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.8owaalp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+        )
+        .then(() => console.log('Connected to database...'))
 }
 
 app.use('/', authRoutes)
