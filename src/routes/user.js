@@ -10,9 +10,7 @@ router.get('/', async (req, res) => {
     res.json({ data: req.user })
 })
 
-router.get('/events', async (req, res) => {
-    const user = req.user
-
+router.get('/events', async (_, res) => {
     const events = await Event.find({ date: { $gte: Date.now() } })
 
     res.json({ events })
@@ -21,11 +19,7 @@ router.get('/events', async (req, res) => {
 router.post('/bets', async (req, res) => {
     const { bets } = req.body
 
-    console.log('BETS', bets)
-
     const user = req.user
-
-    console.log('USER', user)
 
     if (bets?.length !== 0) {
         const filteredBets = bets.filter(
@@ -50,11 +44,11 @@ router.post('/bets', async (req, res) => {
     }
 })
 
-router.get('/standings', async (req, res) => {
+router.get('/standings', async (_, res) => {
     try {
-        const users = User.find()
+        const users = await User.find()
 
-        console.log('USERS', users)
+        res.json({ users })
     } catch (error) {
         return res.json({ error })
     }
