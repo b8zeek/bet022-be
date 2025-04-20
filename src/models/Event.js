@@ -1,20 +1,23 @@
 import { Schema, model } from 'mongoose'
 
-const eventSchema = new Schema({
-    date: {
-        type: Date,
-        required: true
+const eventSchema = new Schema(
+    {
+        date: {
+            type: Date,
+            required: true
+        },
+        availableTips: {
+            type: [String],
+            required: true
+        },
+        outcome: String,
+        award: {
+            type: Number,
+            required: true
+        }
     },
-    availableTips: {
-        type: [String],
-        required: true
-    },
-    outcome: String,
-    award: {
-        type: Number,
-        required: true
-    }
-}, { discriminatorKey: 'type' })
+    { discriminatorKey: 'type' }
+)
 
 export const Event = model('Event', eventSchema)
 
@@ -28,7 +31,7 @@ export const GameEvent = Event.discriminator(
         awayTeam: {
             type: String,
             required: true
-        }  
+        }
     })
 )
 

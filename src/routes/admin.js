@@ -5,15 +5,12 @@ import { GameEvent, SpecialEvent } from '../models/Event.js'
 const router = express.Router()
 
 router.post('/game', async (req, res) => {
-    const {
-        homeTeam,
-        awayTeam,
-        date
-    } = req.body
+    const { homeTeam, awayTeam, date } = req.body
 
-    if (!homeTeam || !awayTeam || !date) return res.json({
-        message: 'Please provide necessary event information!'
-    })
+    if (!homeTeam || !awayTeam || !date)
+        return res.json({
+            message: 'Please provide necessary event information!'
+        })
 
     try {
         const data = await GameEvent.create({
@@ -40,16 +37,18 @@ router.post('/events', async (req, res) => {
 
         const filteredSpecials = events
             .filter(event => event?.type === 'special')
-            .filter(special => special.description && special.date && special.availableTips && special.award)
+            .filter(
+                special =>
+                    special.description &&
+                    special.date &&
+                    special.availableTips &&
+                    special.award
+            )
 
         try {
             if (filteredGames.length !== 0) {
                 await GameEvent.insertMany(
-                    filteredGames.map(({
-                        homeTeam,
-                        awayTeam,
-                        date
-                    }) => ({
+                    filteredGames.map(({ homeTeam, awayTeam, date }) => ({
                         homeTeam,
                         awayTeam,
                         date,
@@ -61,17 +60,14 @@ router.post('/events', async (req, res) => {
 
             if (filteredSpecials.length !== 0) {
                 await SpecialEvent.insertMany(
-                    filteredSpecials.map(({
-                        description,
-                        date,
-                        availableTips,
-                        award
-                    }) => ({
-                        description,
-                        date,
-                        availableTips,
-                        award
-                    }))
+                    filteredSpecials.map(
+                        ({ description, date, availableTips, award }) => ({
+                            description,
+                            date,
+                            availableTips,
+                            award
+                        })
+                    )
                 )
             }
 
@@ -83,16 +79,12 @@ router.post('/events', async (req, res) => {
 })
 
 router.post('/special', async (req, res) => {
-    const {
-        description,
-        date,
-        availableTips,
-        award
-    } = req.body
+    const { description, date, availableTips, award } = req.body
 
-    if (!description || !date || !availableTips || !award) return res.json({
-        message: 'Please provide necessary event information!'
-    })
+    if (!description || !date || !availableTips || !award)
+        return res.json({
+            message: 'Please provide necessary event information!'
+        })
 
     try {
         const data = await SpecialEvent.create({

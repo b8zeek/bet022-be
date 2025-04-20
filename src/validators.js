@@ -12,7 +12,7 @@ export const verifyToken = (req, res, next) => {
 
         next()
     } catch (error) {
-        res.json({ error: 'Token isn\'t valid!' })
+        res.json({ error: "Token isn't valid!" })
     }
 }
 

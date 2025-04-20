@@ -28,23 +28,26 @@ router.post('/bets', async (req, res) => {
     console.log('USER', user)
 
     if (bets?.length !== 0) {
-        const filteredBets = bets.filter(({ eventId, outcome }) => eventId && outcome)
+        const filteredBets = bets.filter(
+            ({ eventId, outcome }) => eventId && outcome
+        )
 
         if (filteredBets.length !== 0) {
-            const data = await Bet.bulkWrite(filteredBets.map(({ eventId, outcome }) => ({
-                updateOne: {
-                    filter: { userId: user.id, eventId },
-                    update: { outcome },
-                    upsert: true
-                }
-            })))
-    
+            const data = await Bet.bulkWrite(
+                filteredBets.map(({ eventId, outcome }) => ({
+                    updateOne: {
+                        filter: { userId: user.id, eventId },
+                        update: { outcome },
+                        upsert: true
+                    }
+                }))
+            )
+
             res.json({ data })
         }
     } else {
         return res.json({ message: 'Please provide valid bets information.' })
     }
-
 })
 
 router.get('/standings', async (req, res) => {
