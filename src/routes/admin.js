@@ -7,6 +7,8 @@ const router = express.Router()
 router.post('/game', async (req, res) => {
     const { homeTeam, awayTeam, date } = req.body
 
+    const availableTips = ['1', '2']
+
     if (!homeTeam || !awayTeam || !date)
         return res.json({
             message: 'Please provide necessary event information!'
@@ -17,7 +19,7 @@ router.post('/game', async (req, res) => {
             homeTeam,
             awayTeam,
             date,
-            availableTips: ['1', 'x', '2'],
+            availableTips,
             award: 1
         })
 
@@ -52,7 +54,7 @@ router.post('/events', async (req, res) => {
                         homeTeam,
                         awayTeam,
                         date,
-                        availableTips: ['1', 'x', '2'],
+                        availableTips,
                         award: 1
                     }))
                 )

@@ -39,7 +39,8 @@ router.post('/register', async (req, res) => {
         userName: req.body.userName,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        password
+        password,
+        isAdmin: false
     })
 
     try {
