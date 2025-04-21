@@ -7,6 +7,10 @@ import { User } from '../models/User.js'
 
 const router = express.Router()
 
+router.get('/', async (_, res) => {
+    res.json({ message: 'Server Works!' })
+})
+
 router.post('/register', async (req, res) => {
     console.log('BODY', req.body)
     const { error } = Joi.object({
