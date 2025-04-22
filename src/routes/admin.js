@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { GameEvent, SpecialEvent } from '../models/Event.js'
+import { Event, GameEvent, SpecialEvent } from '../models/Event.js'
 
 const router = express.Router()
 
@@ -77,6 +77,20 @@ router.post('/events', async (req, res) => {
         } catch (error) {
             res.json({ error })
         }
+    }
+})
+
+router.get('/events', async (_, res) => {
+    try {
+        console.log('EVENTS ROUTE')
+        const events = await Event.find({})
+
+        console.log('Events', events)
+
+        res.json({ events })
+    } catch (error) {
+        console.log(error)
+        return res.json({ error })
     }
 })
 
