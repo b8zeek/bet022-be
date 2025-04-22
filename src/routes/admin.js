@@ -20,7 +20,8 @@ router.post('/game', async (req, res) => {
             awayTeam,
             date,
             availableTips,
-            award: 1
+            award: 1,
+            outcome: ''
         })
 
         res.json({ data })
@@ -30,6 +31,73 @@ router.post('/game', async (req, res) => {
 })
 
 router.post('/events', async (req, res) => {
+    const { events } = req.body
+
+    if (events?.length !== 0) {
+        const filteredGames = events
+            .filter(event => event?.type === 'game')
+            .filter(game => game.homeTeam && game.awayTeam && game.date)
+
+        const filteredSpecials = events
+            .filter(event => event?.type === 'special')
+            .filter(
+                special =>
+                    special.description &&
+                    special.date &&
+                    special.availableTips &&
+                    special.award
+            )
+
+        try {
+            if (filteredGames.length !== 0) {
+                await GameEvent.insertMany(
+                    filteredGames.map(({ homeTeam, awayTeam, date }) => ({
+                        homeTeam,
+                        awayTeam,
+                        date,
+                        availableTips,
+                        award: 1,
+                        outcome: ''
+                    }))
+                )
+            }
+
+            if (filteredSpecials.length !== 0) {
+                await SpecialEvent.insertMany(
+                    filteredSpecials.map(
+                        ({ description, date, availableTips, award }) => ({
+                            description,
+                            date,
+                            availableTips,
+                            award,
+                            outcome: ''
+                        })
+                    )
+                )
+            }
+
+            res.json({ message: 'Successful!' })
+        } catch (error) {
+            res.json({ error })
+        }
+    }
+})
+
+router.get('/events', async (_, res) => {
+    try {
+        console.log('EVENTS ROUTE')
+        const events = await Event.find({})
+
+        console.log('Events', events)
+
+        res.json({ events })
+    } catch (error) {
+        console.log(error)
+        return res.json({ error })
+    }
+})
+
+router.post('/events-update', async (req, res) => {
     const { events } = req.body
 
     if (events?.length !== 0) {
@@ -77,20 +145,6 @@ router.post('/events', async (req, res) => {
         } catch (error) {
             res.json({ error })
         }
-    }
-})
-
-router.get('/events', async (_, res) => {
-    try {
-        console.log('EVENTS ROUTE')
-        const events = await Event.find({})
-
-        console.log('Events', events)
-
-        res.json({ events })
-    } catch (error) {
-        console.log(error)
-        return res.json({ error })
     }
 })
 
